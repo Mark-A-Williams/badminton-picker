@@ -15,11 +15,12 @@
 ## Console app
 
 Options:
-- View past sessions
+- [X] View players
+- [ ] View past sessions
     - Shows the last 5 or so sessions; who played, who wanted to but wasn't selected etc.
-- Create new session
+- [ ] Create new session
     - Default to the next Wednesday
-- Get suggested players for session (the important bit)
+- [ ] Get suggested players for session (the important bit)
     - Input which players want to play. Support copy pasting in comma separated list or whatever format exactly Polly spits out.
     - Assign each player a weighting by looking at the last 3 (arbitrary choice) sessions:
         - If they wanted to play but didn't get to (`NotSelected`), add **1**
@@ -31,7 +32,7 @@ Options:
     - Choose the 8/10/12 players with the highest weightings
     - (FRC) declare the 2 highest priority subs?
     - Option to commit this choice to DB, assigning `Selected` and `NotSelected` as relevant.
-- Substitution
+- [ ] Substitution
     - Applies to the next session that takes place in the future at time of use i.e. if it's Tuesday today, it applies to the session tomorrow.
     - Enter a player who is down to play
     - Enter the player who is going to sub in for them

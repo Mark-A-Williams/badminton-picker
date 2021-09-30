@@ -16,6 +16,8 @@ namespace BadmintonPicker.Entities
                 ps.PlayerId,
                 ps.SessionId
             });
+
+            builder.Entity<Player>().HasIndex(p => new { p.FirstName, p.LastName }).IsUnique();
         }
 
         public DbSet<Player> Players { get; set; } = default!;
