@@ -1,4 +1,6 @@
-﻿namespace BadmintonPicker.Entities
+﻿using System;
+
+namespace BadmintonPicker.Entities
 {
     internal class Session
     {
