@@ -1,9 +1,10 @@
 ﻿using BadmintonPicker.Entities;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BadmintonPicker.Queries
+namespace BadmintonPicker.DataOperations
 {
     internal class DbQueries
     {
@@ -17,6 +18,11 @@ namespace BadmintonPicker.Queries
         public async Task<IEnumerable<Player>> GetAllPlayers()
         {
             return await _appDbContext.Players.ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<Session>> GetRecentSessions(int numberToGet)
+        {
+            throw new NotImplementedException("I'll write this once I remember how navigation properties should work");
         }
     }
 }
