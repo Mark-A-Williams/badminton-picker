@@ -6,5 +6,6 @@ namespace BadmintonPicker.Entities
     {
         public int Id { get; set; }
         public DateTimeOffset Date { get; set; }
+        public IEnumerable<PlayerSession> PlayerSessions { get; set; } = default!;
     }
 }

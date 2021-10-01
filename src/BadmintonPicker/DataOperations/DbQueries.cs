@@ -22,7 +22,13 @@ namespace BadmintonPicker.DataOperations
 
         public async Task<IEnumerable<Session>> GetRecentSessions(int numberToGet)
         {
-            throw new NotImplementedException("I'll write this once I remember how navigation properties should work");
+            return await _appDbContext.Sessions
+                .Include(s => s.PlayerSessions)
+                .ThenInclude(ps => ps.Player)
+                .Where(s => s.Date < DateTimeOffset.Now.Date)
+                .OrderByDescending(s => s.Date)
+                .Take(numberToGet)
+                .ToArrayAsync();
         }
     }
 }

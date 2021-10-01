@@ -76,8 +76,17 @@ namespace BadmintonPicker
 
         private async Task ShowRecentSessions()
         {
+            // WIP but functional
             var sessionsToShow = 5;
-            await _dbQueries.GetRecentSessions(sessionsToShow);
+            var recentSessions = await _dbQueries.GetRecentSessions(sessionsToShow);
+
+            foreach (var session in recentSessions)
+            {
+                foreach (var playerSession in session.PlayerSessions)
+                {
+                    Console.WriteLine($"{playerSession.Player.FirstName} {playerSession.Player.LastName} - {playerSession.Status}");
+                }
+            }
         }
 
         private async Task CreateNewSession()
