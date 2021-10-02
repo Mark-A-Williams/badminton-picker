@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace BadmintonPicker.Entities
 {
     internal class Player

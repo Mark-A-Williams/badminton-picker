@@ -82,6 +82,8 @@ namespace BadmintonPicker
 
             foreach (var session in recentSessions)
             {
+                Console.WriteLine("\n");
+                Console.WriteLine($"Session date: {session.Date:yyyy-MM-dd}");
                 foreach (var playerSession in session.PlayerSessions)
                 {
                     Console.WriteLine($"{playerSession.Player.FirstName} {playerSession.Player.LastName} - {playerSession.Status}");
@@ -112,7 +114,18 @@ namespace BadmintonPicker
                 session = new Session { Date = GetNextWednesday() };
             }
 
-            // TODO handle if there is already one with this date
+            if (await _dbQueries.GetIfSessionExistsWithSameDate(session))
+            {
+                Console.WriteLine("A session already exists with the same date as this. Are you sure you want to add another?");
+
+                var anotherInputIGuess = Console.ReadLine();
+                var shouldProceed = char.TryParse(anotherInputIGuess, out var character) && character == 'y';
+
+                if (!shouldProceed)
+                {
+                    return;
+                }
+            }
             await _dbCommands.AddSession(session);
             Console.WriteLine($"New session created for {session.Date:yyyy-MM-dd}");
         }
