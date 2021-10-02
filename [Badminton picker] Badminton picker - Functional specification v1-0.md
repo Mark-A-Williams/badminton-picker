@@ -16,9 +16,9 @@
 
 Options:
 - [X] View players
-- [ ] View past sessions
+- [X] View past sessions
     - Shows the last 5 or so sessions; who played, who wanted to but wasn't selected etc.
-- [ ] Create new session
+- [X] Create new session
     - Default to the next Wednesday
 - [ ] Get suggested players for session (the important bit)
     - Input which players want to play. Support copy pasting in comma separated list or whatever format exactly Polly spits out.
