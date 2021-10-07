@@ -20,6 +20,13 @@ namespace BadmintonPicker.DataOperations
             return await _appDbContext.Players.ToArrayAsync();
         }
 
+        public async Task<Player?> GetPlayerByFullName(string fullName)
+        {
+            var components = fullName.Split(' ');
+            return await _appDbContext.Players
+                .FirstOrDefaultAsync(o => o.FirstName == components[0] && o.LastName == components[1]);
+        }
+
         public async Task<IEnumerable<Session>> GetRecentSessions(int numberToGet)
         {
             return await _appDbContext.Sessions

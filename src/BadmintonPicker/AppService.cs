@@ -46,6 +46,9 @@ namespace BadmintonPicker
                     case 3:
                         await CreateNewSession();
                         break;
+                    case 4:
+                        await SelectPlayersForUpcomingSession();
+                        break;
                     default:
                         break;
                 }
@@ -82,10 +85,12 @@ namespace BadmintonPicker
 
             foreach (var session in recentSessions)
             {
-                foreach (var playerSession in session.PlayerSessions)
+                Console.WriteLine($"Session date: {session.Date:yyyy-MM-dd}");
+                foreach (var playerSession in session.PlayerSessions.OrderBy(o => o.Status))
                 {
                     Console.WriteLine($"{playerSession.Player.FirstName} {playerSession.Player.LastName} - {playerSession.Status}");
                 }
+                Console.WriteLine("===============");
             }
         }
 
@@ -117,9 +122,69 @@ namespace BadmintonPicker
             Console.WriteLine($"New session created for {session.Date:yyyy-MM-dd}");
         }
 
-        private static async Task SelectPlayersForUpcomingSession()
+        private async Task SelectPlayersForUpcomingSession()
         {
-            throw new NotImplementedException();
+            var playerLimit = 8; // TODO Generalise
+            var weeksToLookBack = 3;
+
+            Console.WriteLine(
+                "Enter a comma separated list of the players who have signed up (copy paste from Polly in Teams)");
+
+            var commaSeparatedPlayers = Console.ReadLine();
+            var playerNames = commaSeparatedPlayers?.Split(", ");
+
+            if (playerNames == null || !playerNames.Any())
+            {
+                Console.WriteLine("No players entered");
+                return;
+            }
+
+            var playerWeightings = new Dictionary<string, double>();
+
+            foreach (var playerName in playerNames)
+            {
+                // Yeah I know it's inefficient
+                var player = await _dbQueries.GetPlayerByFullName(playerName);
+                if (player == null)
+                {
+                    Console.WriteLine($"No player exists with the name '{playerName}'");
+                    return;
+                }
+                playerWeightings.Add(player.Initials, 0);
+            }
+
+            var recentSessions = await _dbQueries.GetRecentSessions(weeksToLookBack);
+            foreach (var session in recentSessions)
+            {
+                foreach (var playerInitials in playerWeightings.Keys)
+                {
+                    var playerStatus = session.PlayerSessions
+                        .SingleOrDefault(o => o.Player.Initials == playerInitials)?
+                        .Status;
+
+                    if (playerStatus == null)
+                    {
+                        playerWeightings[playerInitials] += 0.5;
+                    }
+                    else if (playerStatus == Status.NotSelected)
+                    {
+                        playerWeightings[playerInitials] += 1;
+                    }
+                    else if (playerStatus == Status.DroppedOut)
+                    {
+                        playerWeightings[playerInitials] -= 0.5;
+                    }
+
+                    var rng = new Random();
+                    playerWeightings[playerInitials] += rng.NextDouble() * 0.1;
+                }
+            }
+
+            // TODO actually commit this to DB
+            foreach (var player in playerWeightings.OrderByDescending(o => o.Value))
+            {
+                Console.WriteLine($"{player.Key}: {player.Value}");
+            }
         }
 
         private static async Task SubstitutePlayerForUpcomingSession()
