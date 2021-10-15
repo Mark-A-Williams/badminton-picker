@@ -88,7 +88,24 @@ namespace BadmintonPicker
                 Console.WriteLine($"Session date: {session.Date:yyyy-MM-dd}");
                 foreach (var playerSession in session.PlayerSessions.OrderBy(o => o.Status))
                 {
+                    switch (playerSession.Status)
+                    {
+                        case Status.Selected:
+                        case Status.SubbedIn:
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            break;
+                        case Status.NotSelected:
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            break;
+                        case Status.DroppedOut:
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            break;
+                        default:
+                            break;
+                    }
+
                     Console.WriteLine($"{playerSession.Player.FirstName} {playerSession.Player.LastName} - {playerSession.Status}");
+                    Console.ResetColor();
                 }
                 Console.WriteLine("===============");
             }

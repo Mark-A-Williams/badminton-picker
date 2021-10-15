@@ -34,7 +34,7 @@ namespace BadmintonPicker.DataOperations
                 .Include(s => s.PlayerSessions)
                 .ThenInclude(ps => ps.Player)
                 .Where(s => s.Date < DateTimeOffset.Now.Date)
-                .OrderByDescending(s => s.Date)
+                .OrderBy(s => s.Date)
                 .Take(numberToGet)
                 .ToArrayAsync();
         }
