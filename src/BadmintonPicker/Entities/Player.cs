@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BadmintonPicker.Entities
 {
     internal class Player
     {
-        public int Id { get; set; }
+        [Key]
         public string Initials { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
