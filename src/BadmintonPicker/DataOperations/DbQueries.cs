@@ -25,10 +25,11 @@ namespace BadmintonPicker.DataOperations
         {
             var components = fullName.Split(' ');
             return await _appDbContext.Players
+                .Include(p => p.PlayerSessions)
                 .FirstOrDefaultAsync(o => o.FirstName == components[0] && o.LastName == components[1]);
         }
 
-        public async Task<IEnumerable<Session>> GetRecentSessions(int numberToGet)
+        public async Task<IList<Session>> GetRecentSessions(int numberToGet)
         {
             return await _appDbContext.Sessions
                 .Include(s => s.PlayerSessions)
@@ -36,7 +37,7 @@ namespace BadmintonPicker.DataOperations
                 .Where(s => s.Date < DateTimeOffset.Now.Date)
                 .OrderBy(s => s.Date)
                 .Take(numberToGet)
-                .ToArrayAsync();
+                .ToListAsync();
         }
 
         public async Task<bool> GetIfSessionExistsWithSameDate(Session session)

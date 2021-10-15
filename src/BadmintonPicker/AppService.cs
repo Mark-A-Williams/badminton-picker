@@ -178,41 +178,74 @@ namespace BadmintonPicker
                     Console.WriteLine($"No player exists with the name '{playerName}'");
                     return;
                 }
-                playerWeightings.Add(player.Initials, 0);
+
+                var initialWeighting = player.PlayerSessions.Any(o => o.Status != Status.NotSelected)
+                    ? 0
+                    : 10; // Huge weighting for new players
+
+                playerWeightings.Add(player.Initials, initialWeighting);
             }
 
+            // Ordered by date, most recent last
             var recentSessions = await _dbQueries.GetRecentSessions(weeksToLookBack);
-            foreach (var session in recentSessions)
+            for (int i = 0; i < recentSessions.Count; i++)
             {
+                var session = recentSessions[i];
                 foreach (var playerInitials in playerWeightings.Keys)
                 {
                     var playerStatus = session.PlayerSessions
                         .SingleOrDefault(o => o.Player.Initials == playerInitials)?
                         .Status;
 
+                    var weightingForSession = 0D;
+
                     if (playerStatus == null)
                     {
-                        playerWeightings[playerInitials] += 0.5;
+                        // The player didn't sign up
+                        weightingForSession = 0.25;
                     }
                     else if (playerStatus == Status.NotSelected)
                     {
-                        playerWeightings[playerInitials] += 1;
+                        // High priority to those who weren't selected
+                        weightingForSession = 1;
                     }
                     else if (playerStatus == Status.DroppedOut)
                     {
-                        playerWeightings[playerInitials] -= 0.5;
+                        // Penalty for dropping out
+                        weightingForSession = -0.5;
+                    }
+
+                    if (i == recentSessions.Count - 1)
+                    {
+                        // Weight most recent week doubly
+                        weightingForSession *= 2;
                     }
 
                     var rng = new Random();
-                    playerWeightings[playerInitials] += rng.NextDouble() * 0.1;
+                    playerWeightings[playerInitials] += weightingForSession + (rng.NextDouble() * 0.05);
                 }
             }
 
-            // TODO actually commit this to DB
-            foreach (var player in playerWeightings.OrderByDescending(o => o.Value))
+            var orderedPlayerWeightings = playerWeightings.OrderByDescending(o => o.Value).ToList();
+            for (int i = 0; i < orderedPlayerWeightings.Count; i++)
             {
+                if (i == 0)
+                {
+                    Console.WriteLine("Selected players:");
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                }
+                else if (i == playerLimit)
+                {
+                    Console.ResetColor();
+                    Console.WriteLine("Players not selected:");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                }
+                var player = orderedPlayerWeightings[i];
                 Console.WriteLine($"{player.Key}: {player.Value}");
             }
+
+            Console.ResetColor();
+            // TODO actually commit this to DB
         }
 
         private static async Task SubstitutePlayerForUpcomingSession()
