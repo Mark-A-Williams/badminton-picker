@@ -80,8 +80,7 @@ namespace BadmintonPicker
         private async Task ShowRecentSessions()
         {
             // WIP but functional
-            var sessionsToShow = 5;
-            var recentSessions = await _dbQueries.GetRecentSessions(sessionsToShow);
+            var recentSessions = await _dbQueries.GetRecentSessions(numberToGet: 5);
 
             foreach (var session in recentSessions)
             {
@@ -132,7 +131,7 @@ namespace BadmintonPicker
             }
             else
             {
-                session = new Session { Date = GetNextWednesday() };
+                session = new Session { Date = GetNextSessionDate() };
             }
 
             if (await _dbQueries.GetIfSessionExistsWithSameDate(session))
@@ -153,9 +152,6 @@ namespace BadmintonPicker
 
         private async Task SelectPlayersForUpcomingSession()
         {
-            var playerLimit = 8; // TODO Generalise
-            var weeksToLookBack = 3;
-
             Console.WriteLine(
                 "Enter a comma separated list of the players who have signed up (copy paste from Polly in Teams)");
 
@@ -182,13 +178,13 @@ namespace BadmintonPicker
 
                 var initialWeighting = player.PlayerSessions.Any(o => o.Status != Status.NotSelected)
                     ? 0
-                    : 10; // Huge weighting for new players
+                    : Constants.WeightingForNewPlayer; // Huge weighting for new players
 
                 playerWeightings.Add(player.Initials, initialWeighting);
             }
 
             // Ordered by date, most recent last
-            var recentSessions = await _dbQueries.GetRecentSessions(weeksToLookBack);
+            var recentSessions = await _dbQueries.GetRecentSessions(Constants.WeeksToLookBackForWeightings);
             for (int i = 0; i < recentSessions.Count; i++)
             {
                 var session = recentSessions[i];
@@ -202,28 +198,28 @@ namespace BadmintonPicker
 
                     if (playerStatus == null)
                     {
-                        // The player didn't sign up
-                        weightingForSession = 0.25;
+                        // The player didn't sign up - low additional priority
+                        weightingForSession = Constants.WeightingForDidNotSignUp;
                     }
                     else if (playerStatus == Status.NotSelected)
                     {
                         // High priority to those who weren't selected
-                        weightingForSession = 1;
+                        weightingForSession = Constants.WeightingForNotSelected;
                     }
                     else if (playerStatus == Status.DroppedOut)
                     {
                         // Penalty for dropping out
-                        weightingForSession = -0.5;
+                        weightingForSession = Constants.WeightingForDroppedOut;
                     }
 
                     if (i == recentSessions.Count - 1)
                     {
-                        // Weight most recent week doubly
-                        weightingForSession *= 2;
+                        // Weight most recent week more
+                        weightingForSession *= Constants.WeightingMultiplierForLastWeek;
                     }
 
                     var rng = new Random();
-                    playerWeightings[playerInitials] += weightingForSession + (rng.NextDouble() * 0.05);
+                    playerWeightings[playerInitials] += weightingForSession + (rng.NextDouble() * Constants.WeightingRandomComponent);
                 }
             }
 
@@ -232,7 +228,7 @@ namespace BadmintonPicker
                 .Select((o, position) => new PlayerSelection
                 {
                     Initials = o.Key,
-                    Status = position < playerLimit ? Status.Selected : Status.NotSelected,
+                    Status = position < Constants.PlayerLimit ? Status.Selected : Status.NotSelected,
                     Weighting = o.Value
                 })
                 .ToList();
@@ -275,12 +271,12 @@ namespace BadmintonPicker
             throw new NotImplementedException();
         }
 
-        private static DateTimeOffset GetNextWednesday()
+        private static DateTimeOffset GetNextSessionDate()
         {
             for (int i = 0; i < 7; i++)
             {
                 var day = DateTimeOffset.Now.Date.AddDays(i);
-                if (day.DayOfWeek == DayOfWeek.Wednesday)
+                if (day.DayOfWeek == Constants.BadmintonDay)
                 {
                     return day;
                 }
