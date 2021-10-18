@@ -107,7 +107,8 @@ namespace BadmintonPicker
                     Console.WriteLine($"{playerSession.Player.FirstName} {playerSession.Player.LastName} - {playerSession.Status}");
                     Console.ResetColor();
                 }
-                Console.WriteLine("===============");
+
+                WriteLineBreak();
             }
         }
 
@@ -226,26 +227,47 @@ namespace BadmintonPicker
                 }
             }
 
-            var orderedPlayerWeightings = playerWeightings.OrderByDescending(o => o.Value).ToList();
-            for (int i = 0; i < orderedPlayerWeightings.Count; i++)
+            var playerSelections = playerWeightings
+                .OrderByDescending(o => o.Value)
+                .Select((o, position) => new PlayerSelection
+                {
+                    Initials = o.Key,
+                    Status = position < playerLimit ? Status.Selected : Status.NotSelected,
+                    Weighting = o.Value
+                })
+                .ToList();
+
+            Console.WriteLine("Selected players:");
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            foreach (var selection in playerSelections.Where(o => o.Status == Status.Selected))
             {
-                if (i == 0)
-                {
-                    Console.WriteLine("Selected players:");
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                }
-                else if (i == playerLimit)
-                {
-                    Console.ResetColor();
-                    Console.WriteLine("Players not selected:");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                }
-                var player = orderedPlayerWeightings[i];
-                Console.WriteLine($"{player.Key}: {player.Value}");
+                Console.WriteLine($"{selection.Initials}: {selection.Weighting}");
             }
 
             Console.ResetColor();
-            // TODO actually commit this to DB
+            Console.WriteLine("Players not selected:");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            foreach (var selection in playerSelections.Where(o => o.Status == Status.NotSelected))
+            {
+                Console.WriteLine($"{selection.Initials}: {selection.Weighting}");
+            }
+
+            Console.ResetColor();
+            Console.WriteLine("Commit selection to database?");
+
+            var input = Console.ReadLine();
+            var shouldProceed = char.TryParse(input, out var character) && character == 'y';
+
+            if (!shouldProceed)
+            {
+                return;
+            }
+
+            var upcomingSession = await _dbQueries.GetUpcomingSession();
+            await _dbCommands.CommitPlayerSelection(upcomingSession, playerSelections);
+
+            Console.WriteLine("Player selections successfully committed.");
+            WriteLineBreak();
         }
 
         private static async Task SubstitutePlayerForUpcomingSession()
@@ -265,6 +287,11 @@ namespace BadmintonPicker
             }
 
             throw new Exception("What is this, a leap week?");
+        }
+
+        private static void WriteLineBreak()
+        {
+            Console.WriteLine("===============");
         }
     }
 }

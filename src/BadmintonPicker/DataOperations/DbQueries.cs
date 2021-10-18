@@ -46,5 +46,14 @@ namespace BadmintonPicker.DataOperations
                 .Where(s => s.Date.Date == session.Date.Date)
                 .AnyAsync();
         }
+
+        public async Task<Session> GetUpcomingSession()
+        {
+            // TODO account for possibility of multiple future sessions already existing
+            // and also of none existing?
+            return await _appDbContext.Sessions
+                .Where(s => s.Date >= DateTimeOffset.Now.Date)
+                .FirstOrDefaultAsync();
+        }
     }
 }
