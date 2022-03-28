@@ -29,12 +29,17 @@ namespace BadmintonPicker.DataOperations
                 .FirstOrDefaultAsync(o => o.FirstName == components[0] && o.LastName == components[1]);
         }
 
-        public async Task<IList<Session>> GetRecentSessions(int numberToGet)
+        public async Task<IList<Session>> GetRecentSessions(
+            int numberToGet = 3,
+            int numberOfWeeksToLookBack = 100)
         {
+            var oldestToTake = DateTimeOffset.Now.Date - TimeSpan.FromDays(7 * numberOfWeeksToLookBack);
+
             return await _appDbContext.Sessions
                 .Include(s => s.PlayerSessions)
                 .ThenInclude(ps => ps.Player)
                 .Where(s => s.Date < DateTimeOffset.Now.Date)
+                .Where(s => s.Date > oldestToTake)
                 .OrderBy(s => s.Date)
                 .Take(numberToGet)
                 .ToListAsync();

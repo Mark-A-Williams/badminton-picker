@@ -185,7 +185,9 @@ namespace BadmintonPicker
             }
 
             // Ordered by date, most recent last
-            var recentSessions = await _dbQueries.GetRecentSessions(Constants.WeeksToLookBackForWeightings);
+            var recentSessions = await _dbQueries.GetRecentSessions(
+                numberOfWeeksToLookBack: Constants.WeeksToLookBackForWeightings);
+
             for (int i = 0; i < recentSessions.Count; i++)
             {
                 var session = recentSessions[i];
