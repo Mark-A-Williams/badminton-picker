@@ -1,8 +1,10 @@
-﻿namespace BadmintonPicker
+﻿using System;
+
+namespace BadmintonPicker
 {
     internal static class Constants
     {
-        public const int PlayerLimit = 12;
+        public const int PlayerLimit = 16;
         public const DayOfWeek BadmintonDay = DayOfWeek.Wednesday;
         public const int WeeksToLookBackForWeightings = 3;
         public const int WeightingMultiplierForLastWeek = 2;
