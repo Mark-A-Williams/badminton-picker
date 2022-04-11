@@ -1,6 +1,6 @@
-DECLARE @SessionDate DATETIMEOFFSET = '2021-12-08'
-DECLARE @DroppingOutPlayerInitials NVARCHAR(2) = 'JT'
-DECLARE @SubbingInPlayerInitials NVARCHAR(2) = 'AU'
+DECLARE @SessionDate DATETIMEOFFSET = '2022-04-06 00:00:00.0000000 +01:00'
+DECLARE @DroppingOutPlayerInitials NVARCHAR(2) = 'JS'
+DECLARE @SubbingInPlayerInitials NVARCHAR(2) = 'HM'
 
 DECLARE @SessionId INT
 SELECT @SessionId = [Id] FROM [Sessions] WHERE [Date] = @SessionDate

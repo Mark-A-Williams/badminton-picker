@@ -36,12 +36,12 @@ namespace BadmintonPicker.DataOperations
             var oldestToTake = DateTimeOffset.Now.Date - TimeSpan.FromDays(7 * numberOfWeeksToLookBack);
 
             return await _appDbContext.Sessions
+                .OrderByDescending(s => s.Date)
                 .Include(s => s.PlayerSessions)
                 .ThenInclude(ps => ps.Player)
-                .Where(s => s.Date < DateTimeOffset.Now.Date)
                 .Where(s => s.Date > oldestToTake)
-                .OrderBy(s => s.Date)
                 .Take(numberToGet)
+                .OrderBy(s => s.Date)
                 .ToListAsync();
         }
 
