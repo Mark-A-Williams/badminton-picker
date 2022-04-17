@@ -4,7 +4,9 @@
     {
         Selected,
         NotSelected,
-        DroppedOut,
-        SubbedIn
+        DroppedOutNormal,
+        SubbedInNormal,
+        DroppedOutShortNotice,
+        SubbedInShortNotice
     }
 }

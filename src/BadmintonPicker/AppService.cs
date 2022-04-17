@@ -86,23 +86,20 @@ namespace BadmintonPicker
             foreach (var session in recentSessions)
             {
                 Console.WriteLine($"Session date: {session.Date:yyyy-MM-dd}");
-                foreach (var playerSession in session.PlayerSessions.OrderBy(o => o.Status))
+                foreach (var playerSession in session.PlayerSessions
+                    .OrderByDescending(o => DidPlayerPlay(o.Status))
+                    .ThenBy(o => o.Status)
+                    .ThenBy(o => o.PlayerId))
                 {
-                    switch (playerSession.Status)
+                    Console.ForegroundColor = playerSession.Status switch
                     {
-                        case Status.Selected:
-                        case Status.SubbedIn:
-                            Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            break;
-                        case Status.NotSelected:
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            break;
-                        case Status.DroppedOut:
-                            Console.ForegroundColor = ConsoleColor.DarkRed;
-                            break;
-                        default:
-                            break;
-                    }
+                        Status.SubbedInNormal => ConsoleColor.DarkBlue,
+                        Status.SubbedInShortNotice => ConsoleColor.Blue,
+                        Status.NotSelected => ConsoleColor.Yellow,
+                        Status.DroppedOutShortNotice => ConsoleColor.DarkRed,
+                        Status.DroppedOutNormal => ConsoleColor.Gray,
+                        _ => ConsoleColor.DarkGreen,
+                    };
 
                     Console.WriteLine($"{playerSession.Player.FirstName} {playerSession.Player.LastName} - {playerSession.Status}");
                     Console.ResetColor();
@@ -209,10 +206,15 @@ namespace BadmintonPicker
                         // High priority to those who weren't selected
                         weightingForSession = Constants.WeightingForNotSelected;
                     }
-                    else if (playerStatus == Status.DroppedOut)
+                    else if (playerStatus == Status.SubbedInShortNotice)
                     {
-                        // Penalty for dropping out
-                        weightingForSession = Constants.WeightingForDroppedOut;
+                        //High priority to those who subbed in at short notice e.g. on the day
+                        weightingForSession = Constants.WeightingForSubbedInShortNotice;
+                    }
+                    else if (playerStatus == Status.DroppedOutShortNotice)
+                    {
+                        // Penalty for dropping out with short notice
+                        weightingForSession = Constants.WeightingForDroppedOutShortNotice;
                     }
 
                     if (i == recentSessions.Count - 1)
@@ -291,6 +293,16 @@ namespace BadmintonPicker
         private static void WriteLineBreak()
         {
             Console.WriteLine("===============");
+        }
+
+        private static bool DidPlayerPlay(Status status)
+        {
+            return status switch
+            {
+                Status.Selected or Status.SubbedInNormal or Status.SubbedInShortNotice => true,
+                Status.NotSelected or Status.DroppedOutNormal or Status.DroppedOutShortNotice => false,
+                _ => throw new NotSupportedException()
+            };
         }
     }
 }
