@@ -12,6 +12,7 @@ namespace BadmintonPicker
         public const double WeightingForNewPlayer = 10;
         public const double WeightingForNotSelected = 1;
         public const double WeightingForSubbedInShortNotice = 1;
+        public const double WeightingForSubbedInNormal = 0.5;
         public const double WeightingForDidNotSignUp = 0.25;
         public const double WeightingForDroppedOutShortNotice = -0.5;
         public const double WeightingRandomComponent = 0.05;

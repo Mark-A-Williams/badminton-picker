@@ -208,8 +208,13 @@ namespace BadmintonPicker
                     }
                     else if (playerStatus == Status.SubbedInShortNotice)
                     {
-                        //High priority to those who subbed in at short notice e.g. on the day
+                        // High priority to those who subbed in at short notice e.g. on the day
                         weightingForSession = Constants.WeightingForSubbedInShortNotice;
+                    }
+                    else if (playerStatus == Status.SubbedInNormal)
+                    {
+                        // Medium priority to those who weren't selected last time but subbed in
+                        weightingForSession = Constants.WeightingForSubbedInNormal;
                     }
                     else if (playerStatus == Status.DroppedOutShortNotice)
                     {
@@ -259,6 +264,7 @@ namespace BadmintonPicker
             var input = Console.ReadLine();
             var shouldProceed = char.TryParse(input, out var character) && character == 'y';
 
+            // Known bug - pasting the selections in with one or more newlines afterwards results in it just skipping this bit
             if (!shouldProceed)
             {
                 return;
