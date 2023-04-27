@@ -4,8 +4,8 @@ namespace BadmintonPicker
 {
     internal class PlayerSelection
     {
-        public string Initials { get; set; } = default!;
-        public Status Status { get; set; }
-        public double Weighting { get; set; }
+        public required string Initials { get; init; }
+        public Status Status { get; init; }
+        public double Weighting { get; init; }
     }
 }

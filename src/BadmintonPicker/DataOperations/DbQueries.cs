@@ -33,7 +33,7 @@ namespace BadmintonPicker.DataOperations
             int numberToGet = 3,
             int numberOfWeeksToLookBack = 100)
         {
-            var oldestToTake = DateTimeOffset.Now.Date - TimeSpan.FromDays(7 * numberOfWeeksToLookBack);
+            var oldestToTake = DateOnly.FromDateTime(DateTimeOffset.Now.Date).AddDays(-7 * numberOfWeeksToLookBack);
 
             return await _appDbContext.Sessions
                 .OrderByDescending(s => s.Date)
@@ -48,7 +48,7 @@ namespace BadmintonPicker.DataOperations
         public async Task<bool> GetIfSessionExistsWithSameDate(Session session)
         {
             return await _appDbContext.Sessions
-                .Where(s => s.Date.Date == session.Date.Date)
+                .Where(s => s.Date == session.Date)
                 .AnyAsync();
         }
 
@@ -57,8 +57,8 @@ namespace BadmintonPicker.DataOperations
             // TODO account for possibility of multiple future sessions already existing
             // and also of none existing?
             return await _appDbContext.Sessions
-                .Where(s => s.Date >= DateTimeOffset.Now.Date)
-                .FirstOrDefaultAsync();
+                .Where(s => s.Date >= DateOnly.FromDateTime(DateTimeOffset.Now.Date))
+                .FirstAsync();
         }
     }
 }

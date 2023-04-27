@@ -118,7 +118,7 @@ namespace BadmintonPicker
 
             if (!string.IsNullOrEmpty(input))
             {
-                if (DateTimeOffset.TryParse(input, out var result))
+                if (DateOnly.TryParse(input, out var result))
                 {
                     session = new Session { Date = result };
                 }
@@ -282,11 +282,11 @@ namespace BadmintonPicker
             throw new NotImplementedException();
         }
 
-        private static DateTimeOffset GetNextSessionDate()
+        private static DateOnly GetNextSessionDate()
         {
             for (int i = 0; i < 7; i++)
             {
-                var day = DateTimeOffset.Now.Date.AddDays(i);
+                var day = DateOnly.FromDateTime(DateTimeOffset.Now.Date).AddDays(i);
                 if (day.DayOfWeek == Constants.BadmintonDay)
                 {
                     return day;

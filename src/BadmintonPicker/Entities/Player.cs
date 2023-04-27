@@ -9,7 +9,7 @@ namespace BadmintonPicker.Entities
         public string Initials { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public IEnumerable<PlayerSession> PlayerSessions { get; set; } = default!;
+        public ICollection<PlayerSession> PlayerSessions { get; set; } = new List<PlayerSession>();
 
         public Player(string initials, string firstName, string lastName)
         {
