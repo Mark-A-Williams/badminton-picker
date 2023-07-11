@@ -29,7 +29,7 @@ namespace BadmintonPicker.Entities
                 .HaveColumnType("date");
         }
 
-        public DbSet<Player> Players  => Set<Player>();
+        public DbSet<Player> Players => Set<Player>();
         public DbSet<Session> Sessions => Set<Session>();
         public DbSet<PlayerSession> PlayerSessions => Set<PlayerSession>();
 

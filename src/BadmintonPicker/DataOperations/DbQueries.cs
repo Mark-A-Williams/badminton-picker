@@ -56,8 +56,10 @@ namespace BadmintonPicker.DataOperations
         {
             // TODO account for possibility of multiple future sessions already existing
             // and also of none existing?
+            var sessionDate = DateOnly.FromDateTime(DateTimeOffset.Now.Date);
+
             return await _appDbContext.Sessions
-                .Where(s => s.Date >= DateOnly.FromDateTime(DateTimeOffset.Now.Date))
+                .Where(s => s.Date >= sessionDate)
                 .FirstAsync();
         }
     }

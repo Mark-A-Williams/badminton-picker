@@ -1,11 +1,21 @@
-﻿namespace BadmintonPicker.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BadmintonPicker.Entities
 {
     internal class PlayerSession
     {
-        public string PlayerId { get; set; } = default!;
-        public Player Player { get; set; } = default!;
+        [Required]
+        public required string PlayerId { get; set; }
+
+        [Required]
+        public Player? Player { get; set; }
+
+        [Required]
         public int SessionId { get; set; }
-        public Session Session { get; set; } = default!;
+
+        [Required]
+        public Session? Session { get; set; }
+
         public Status Status { get; set; }
     }
 }
