@@ -10,6 +10,7 @@ namespace BadmintonPicker.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public ICollection<PlayerSession> PlayerSessions { get; set; } = new List<PlayerSession>();
+        public bool Retired { get; set; }
 
         public Player(string initials, string firstName, string lastName)
         {
